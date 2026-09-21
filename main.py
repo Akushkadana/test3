@@ -1,63 +1,89 @@
 import flet as ft
 
 
+def get_result(score, attendance):
+    if score < 0 or score > 100:
+        return "Некорректный балл"
+
+    if attendance < 0 or attendance > 100:
+        return "Некорректная посещаемость"
+
+    if score >= 90 and attendance >= 80:
+        return "Отлично"
+
+    if score >= 70 and attendance >= 70:
+        return "Хорошо"
+
+    if score >= 50 and attendance >= 60:
+        return "Зачёт"
+
+    return "Незачёт"
+
+
 def main(page: ft.Page):
-    page.title = "Мой список задач"
+    page.title = "Результат студента"
     page.window_width = 500
     page.window_height = 600
     page.padding = 30
 
     title = ft.Text(
-        "Мой список задач",
-        size=28,
+        "Определение результата студента",
+        size=24,
         weight=ft.FontWeight.BOLD
     )
 
-    task_input = ft.TextField(
-        label="Введите задачу",
-        hint_text="Например: Сделать домашнее задание",
-        expand=True
+    score_input = ft.TextField(
+        label="Баллы (0-100)",
+        width=300
     )
 
-    tasks = ft.Column()
+    attendance_input = ft.TextField(
+        label="Посещаемость (0-100)",
+        width=300
+    )
 
-    def add_task(e):
-        if task_input.value.strip():
-            checkbox = ft.Checkbox(
-                label=task_input.value,
-            )
+    result_text = ft.Text(
+        "",
+        size=22,
+        weight=ft.FontWeight.BOLD
+    )
 
-            tasks.controls.append(checkbox)
+    def calculate(e):
+        try:
+            score = float(score_input.value)
+            attendance = float(attendance_input.value)
 
-            task_input.value = ""
-            page.update()
+            result = get_result(score, attendance)
 
-    def clear_tasks(e):
-        tasks.controls.clear()
+            result_text.value = result
+
+            if result == "Отлично":
+                result_text.color = "green"
+            elif result == "Хорошо":
+                result_text.color = "blue"
+            elif result == "Зачёт":
+                result_text.color = "orange"
+            else:
+                result_text.color = "red"
+
+        except ValueError:
+            result_text.value = "Введите числа!"
+            result_text.color = "red"
+
         page.update()
 
-    add_button = ft.Button(
-        content="Добавить",
-        on_click=add_task
-    )
-
-    clear_button = ft.Button(
-        content="Очистить",
-        on_click=clear_tasks
+    calculate_button = ft.Button(
+        content="Определить результат",
+        on_click=calculate
     )
 
     page.add(
         title,
         ft.Divider(),
-        ft.Row(
-            controls=[
-                task_input,
-                add_button
-            ]
-        ),
-        ft.Divider(),
-        tasks,
-        clear_button
+        score_input,
+        attendance_input,
+        calculate_button,
+        result_text
     )
 
 
